@@ -1,12 +1,16 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const axios = require('axios');
 const { URL } = require('url');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Load from environment
+// ✅ Enable CORS for all domains (or restrict in production)
+app.use(cors());
+
+// 🔐 Load API Key and CSE ID from environment
 const API_KEY = process.env.GOOGLE_API_KEY;
 const CSE_ID = process.env.CSE_ID;
 
@@ -15,7 +19,7 @@ if (!API_KEY || !CSE_ID) {
   process.exit(1);
 }
 
-// Extract product title from BigBasket URL
+// 🧠 Extract product title from BigBasket URL
 function extractTitleFromUrl(urlString) {
   try {
     const url = new URL(urlString);
@@ -31,12 +35,12 @@ function extractTitleFromUrl(urlString) {
   return "Unknown Title";
 }
 
-// Test route
+// 🧪 Simple test route
 app.get('/hello', (req, res) => {
   res.send('👋 Hello from the Barcode Search API!');
 });
 
-// Barcode search route
+// 🔍 Barcode search endpoint
 app.get('/search', async (req, res) => {
   const barcode = req.query.barcode;
   if (!barcode) {
@@ -44,10 +48,10 @@ app.get('/search', async (req, res) => {
   }
 
   const query = `${barcode} site:bigbasket.com`;
-  const url = 'https://www.googleapis.com/customsearch/v1';
+  const apiUrl = 'https://www.googleapis.com/customsearch/v1';
 
   try {
-    const { data } = await axios.get(url, {
+    const { data } = await axios.get(apiUrl, {
       params: {
         q: query,
         cx: CSE_ID,
@@ -66,18 +70,18 @@ app.get('/search', async (req, res) => {
     const page_url = item.image?.contextLink || "No Page URL";
     const title = extractTitleFromUrl(page_url);
 
-    res.json({
+    return res.json({
       product_name: title,
       image_url,
       page_url
     });
   } catch (error) {
     console.error("❌ Error fetching search results:", error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Start server
+// 🚀 Start the server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
