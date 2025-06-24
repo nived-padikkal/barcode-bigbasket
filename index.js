@@ -7,7 +7,7 @@ const { URL } = require('url');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Enable CORS for all domains (or restrict in production)
+// ✅ Enable CORS
 app.use(cors());
 
 // 🔐 Load API Key and CSE ID from environment
@@ -19,7 +19,7 @@ if (!API_KEY || !CSE_ID) {
   process.exit(1);
 }
 
-// 🧠 Extract product title from BigBasket URL
+// 🧠 Extract product title from BigBasket URL slug
 function extractTitleFromUrl(urlString) {
   try {
     const url = new URL(urlString);
@@ -32,12 +32,12 @@ function extractTitleFromUrl(urlString) {
   } catch (error) {
     console.error("⚠️ Error parsing title:", error.message);
   }
-  return "Unknown Title";
+  return null;
 }
 
 // 🧪 Simple test route
 app.get('/hello', (req, res) => {
-  res.send('👋 Hello from the Barcode Search API!');
+  res.json({ message: '👋 Hello from the Barcode Search API!' });
 });
 
 // 🔍 Barcode search endpoint
@@ -62,16 +62,16 @@ app.get('/search', async (req, res) => {
     });
 
     if (!data.items || data.items.length === 0) {
-      return res.status(404).json({ error: '❌ No results found' });
+      return res.status(404).json({ error: '❌ No results found for this barcode' });
     }
 
     const item = data.items[0];
-    const image_url = item.link;
-    const page_url = item.image?.contextLink || "No Page URL";
-    const title = extractTitleFromUrl(page_url);
+    const image_url = item.link || null;
+    const page_url = item.image?.contextLink || null;
+    const title = page_url ? extractTitleFromUrl(page_url) : null;
 
     return res.json({
-      product_name: title,
+      product_name: title || "Unknown Product",
       image_url,
       page_url
     });
