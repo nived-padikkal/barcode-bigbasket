@@ -25,7 +25,7 @@ function extractTitleFromUrl(urlString) {
     const url = new URL(urlString);
     const parts = url.pathname.split('/');
     if (parts.length >= 3) {
-      const rawTitle = parts[2];
+      const rawTitle = parts[3];
       const words = rawTitle.replace(/[^a-zA-Z0-9\-]/g, '').split('-');
       return words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
