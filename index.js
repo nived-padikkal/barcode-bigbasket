@@ -40,6 +40,8 @@ app.get('/hello', (req, res) => {
   res.json({ message: '👋 Hello from the Barcode Search API!' });
 });
 
+app.get('/', (req, res) => res.send('✅ API is running'));
+
 // 🔍 Barcode search endpoint
 app.get('/search', async (req, res) => {
   const barcode = req.query.barcode;
