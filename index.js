@@ -86,4 +86,8 @@ app.get('/search', async (req, res) => {
 // 🚀 Start the server
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
+  console.log("Starting app...");
+  console.log("PORT:", PORT);
+  console.log("GOOGLE_API_KEY present:", !!API_KEY);
+  console.log("CSE_ID present:", !!CSE_ID);
 });
